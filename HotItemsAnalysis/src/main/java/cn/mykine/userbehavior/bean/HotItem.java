@@ -50,9 +50,9 @@ public class HotItem {
         properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.setProperty("auto.offset.reset", "latest");
 
-//        DataStream<String> inputStream = env.addSource(new FlinkKafkaConsumer<String>("hotitems", new SimpleStringSchema(), properties));
+        DataStream<String> inputStream = env.addSource(new FlinkKafkaConsumer<String>("hotitems", new SimpleStringSchema(), properties));
 
-        DataStream<String> inputStream = env.readTextFile("C:\\codeDemo\\UserBehaviorAnalysis\\HotItemsAnalysis\\src\\main\\resources\\UserBehavior.csv");
+//        DataStream<String> inputStream = env.readTextFile("C:\\codeDemo\\UserBehaviorAnalysis\\HotItemsAnalysis\\src\\main\\resources\\UserBehavior.csv");
 
         //2.转换计算
         //2.1 转换成数据对象并过滤出需要的数据
@@ -74,7 +74,7 @@ public class HotItem {
         DataStream<ItemViewCount> dataWindowAgg = dataStream
                 .keyBy("itemId")
 //                .timeWindow(Time.hours(1), Time.minutes(5))
-                .timeWindow(Time.seconds(30), Time.seconds(15))
+                .timeWindow(Time.seconds(10), Time.seconds(3))
                 .aggregate(new ItemCountAgg(), new WindowItemCountResult());
 
 
