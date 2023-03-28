@@ -24,7 +24,7 @@ public class MyKafkaStringDeserializationSchema implements KafkaDeserializationS
         String topic = record.topic();
         int partition = record.partition();
         long offset = record.offset();
-        String id = topic + "-" + partition + "-" + offset;
+        String id = topic + "_" + partition + "_" + offset;
         String value = new String(record.value(), StandardCharsets.UTF_8);
         return Tuple2.of(id, value);
     }
