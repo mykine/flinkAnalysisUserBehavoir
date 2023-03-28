@@ -53,7 +53,8 @@ public class UGAdClickData {
 
             ElasticsearchSink.Builder<AdClickData> adClickDataBuilder = new ElasticsearchSink.Builder<>(httpHosts,
                     new MyEsSinkFunction());
-            adClickDataBuilder.setBulkFlushMaxActions(1);
+//            adClickDataBuilder.setBulkFlushMaxActions(1000);//每1000条数据提交一次
+            adClickDataBuilder.setBulkFlushInterval(100);//每100ms条提交一次
             mapList.addSink(adClickDataBuilder.build());
 
             //exec
