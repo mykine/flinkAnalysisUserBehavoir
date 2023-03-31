@@ -32,15 +32,15 @@ public class UGAdClickData {
             //tansformation
             //-先将数据转化为bean
             DataStream<AdClickData> mapList = kafkaStream
-             .map(new MapFunction<Tuple2<String, String>, AdClickData>() {
-                @Override
-                public AdClickData map(Tuple2<String, String> value) throws Exception {
-                    AdClickData adClickData = JSON.parseObject(value.f1, AdClickData.class);
-                    String id = value.f0 + "_" + adClickData.getPlatform() + "_" + adClickData.getClickId();
-                    adClickData.setId(id);
-                    return adClickData;
-                }
-            });
+                    .map(new MapFunction<Tuple2<String, String>, AdClickData>() {
+                        @Override
+                        public AdClickData map(Tuple2<String, String> value) throws Exception {
+                            AdClickData adClickData = JSON.parseObject(value.f1, AdClickData.class);
+                            String id = value.f0 + "_" + adClickData.getPlatform() + "_" + adClickData.getClickId();
+                            adClickData.setId(id);
+                            return adClickData;
+                        }
+                    });
 
             //sink-写入到es
             mapList.print();
@@ -55,10 +55,12 @@ public class UGAdClickData {
                     new MyEsSinkFunction());
 //            adClickDataBuilder.setBulkFlushMaxActions(1000);//每1000条数据提交一次
             adClickDataBuilder.setBulkFlushInterval(100);//每100ms条提交一次
-            mapList.addSink(adClickDataBuilder.build());
+            mapList.addSink(adClickDataBuilder.build())
+                    .setParallelism(3)//并行度与es主分片数目一致，提高写入性能
+            ;
 
             //exec
-            FlinkUtils.env.execute();
+            FlinkUtils.env.execute("adClick");
 
         } catch (Exception e) {
             log.error("UGAdClickData run error",e);
