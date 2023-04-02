@@ -39,7 +39,7 @@ public class UGAdClickData {
                             adClickData.setId(id);
                             return adClickData;
                         }
-                    });
+                    }).setParallelism(3);
 
             //sink-写入到es
             mapList.print();
@@ -54,8 +54,9 @@ public class UGAdClickData {
                     httpHosts,
                     new MyEsSinkFunction()
             );
-//            adClickDataBuilder.setBulkFlushMaxActions(1000);//每1000条数据提交一次
-            adClickDataBuilder.setBulkFlushInterval(100);//每100ms条提交一次
+            adClickDataBuilder.setBulkFlushMaxActions(5000);//每5000条数据提交一次
+            adClickDataBuilder.setBulkFlushInterval(1000);//每1s条提交一次
+            adClickDataBuilder.setBulkFlushMaxSizeMb(1);//内存到达1M时刷新
             mapList.addSink(adClickDataBuilder.build())
                     .setParallelism(3)//并行度与es主分片数目一致，提高写入性能
             ;
