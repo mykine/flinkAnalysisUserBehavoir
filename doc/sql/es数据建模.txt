@@ -1,0 +1,69 @@
+##############配置时间戳pipeline####################
+PUT _ingest/pipeline/ug_timestamp_pipeline
+{
+  "processors": [
+    {
+        "script": {
+        "lang": "painless",
+        "source": """
+                def imp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+          imp.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+            def ts = imp.format(new Date((new Date().getTime())));
+            ctx.update_time = ts;
+        """
+      }
+    }
+  ]
+}
+
+##############创建广告点击行为数据索引####################
+PUT /ug-test1
+{
+    "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1,
+      "default_pipeline": "ug_timestamp_pipeline"
+    },
+    "mappings":{
+        "properties":{
+            "id":{"type":"keyword"},
+            "platform":{"type":"integer"},
+            "clickId":{"type":"keyword"},
+            "clickTime":{"type":"long"},
+            "clickTimeDate": {
+              "type": "date",
+              "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            },
+            "iosDeviceid":{"type":"keyword"},
+            "imei":{"type":"keyword"},
+            "oaid":{"type":"keyword"},
+            "androidId":{"type":"keyword"},
+            "adId":{"type":"keyword"},
+            "adName":{"type":"text","analyzer":"standard","search_analyzer":"standard"}
+        }
+    }
+}
+
+##############创建用户激活数据索引####################
+PUT /ug-user2
+{
+    "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1,
+      "default_pipeline": "ug_timestamp_pipeline"
+    },
+    "mappings":{
+        "properties":{
+            "id":{"type":"keyword"},
+            "firstLoginTime":{"type":"long"},
+            "firstLoginTimeDate": {
+              "type": "date",
+              "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            },
+            "iosDeviceid":{"type":"keyword"},
+            "imei":{"type":"keyword"},
+            "oaid":{"type":"keyword"},
+            "androidId":{"type":"keyword"}
+        }
+    }
+}
