@@ -5,7 +5,15 @@ import lombok.Data;
 @Data
 public class LoginUserData {
 
+    /**
+     * 用户uid
+     * */
     private String id;
+
+    /**
+     * 平台类型:1-广点通,2-应用宝,3-华为,4-粉丝通,5-小米,6-OPPO,7-VIVO,8-百度SEM
+     */
+    private Integer platform;
 
     /**
      * 登录的时间(毫秒级)
@@ -37,5 +45,14 @@ public class LoginUserData {
      */
     private String androidId;
 
+    /**
+     * 广告id
+     */
+    private String adId;
+
+    /**
+     * 广告名称
+     */
+    private String adName;
 
 }

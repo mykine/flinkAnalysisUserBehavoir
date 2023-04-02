@@ -45,7 +45,7 @@ PUT /ug-test1
 }
 
 ##############创建用户激活数据索引####################
-PUT /ug-user2
+PUT /ug-user1
 {
     "settings": {
       "number_of_shards": 3,
@@ -54,7 +54,8 @@ PUT /ug-user2
     },
     "mappings":{
         "properties":{
-            "id":{"type":"keyword"},
+            "uid":{"type":"keyword"},
+            "platform":{"type":"integer"},
             "firstLoginTime":{"type":"long"},
             "firstLoginTimeDate": {
               "type": "date",
@@ -63,7 +64,9 @@ PUT /ug-user2
             "iosDeviceid":{"type":"keyword"},
             "imei":{"type":"keyword"},
             "oaid":{"type":"keyword"},
-            "androidId":{"type":"keyword"}
+            "androidId":{"type":"keyword"},
+            "adId":{"type":"keyword"},
+            "adName":{"type":"text","analyzer":"standard","search_analyzer":"standard"}
         }
     }
 }

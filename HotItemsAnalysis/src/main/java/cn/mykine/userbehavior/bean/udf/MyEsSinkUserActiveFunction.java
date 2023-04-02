@@ -19,7 +19,7 @@ public class MyEsSinkUserActiveFunction implements ElasticsearchSinkFunction<Log
         // 定义写入的数据source
         log.info("process element={}",element);
         HashMap<String, String> dataSource = new HashMap<>();
-        dataSource.put("id", element.getId());
+        dataSource.put("uid", element.getId());
         dataSource.put("firstLoginTime", element.getLoginTime().toString());
         dataSource.put("firstLoginTimeDate",
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -29,10 +29,12 @@ public class MyEsSinkUserActiveFunction implements ElasticsearchSinkFunction<Log
         dataSource.put("imei", element.getImei());
         dataSource.put("oaid", element.getOaid());
         dataSource.put("androidId", element.getAndroidId());
+        dataSource.put("adId", element.getAdId());
+        dataSource.put("adName", element.getAdName());
 
         // 创建请求，作为向es发起的写入命令
         IndexRequest indexRequest = Requests.indexRequest()
-                .index("ug-user2")
+                .index("ug-user1")
                 .source(dataSource)
                 .id(element.getId());
 

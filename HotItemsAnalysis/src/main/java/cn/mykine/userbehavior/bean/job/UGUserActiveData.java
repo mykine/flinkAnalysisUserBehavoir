@@ -51,6 +51,9 @@ public class UGUserActiveData {
                         }
                     }).setParallelism(3);
 
+            //查询es是否广告投放转化的用户，进一步过滤，匹配成功附加广告投放相关的字段值
+
+
             //sink-写入到es
             newUserList.print();
 
