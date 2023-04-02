@@ -76,7 +76,9 @@ public class FlinkUtils {
 
         kafkaConsumer.setCommitOffsetsOnCheckpoints(false);
 
-        return env.addSource(kafkaConsumer).setParallelism(3);//并行度与Kafka分区数保持一致，提高性能
+        return env.addSource(kafkaConsumer)
+                .setParallelism(3)//并行度与Kafka分区数保持一致，提高性能
+                ;
 
     }
 

@@ -1,6 +1,7 @@
 package cn.mykine.userbehavior.bean.udf;
 
 import cn.mykine.userbehavior.bean.pojo.AdClickData;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+@Slf4j
 public class MyEsSinkFunction implements ElasticsearchSinkFunction<AdClickData> {
     @Override
     public void process(AdClickData element, RuntimeContext ctx, RequestIndexer indexer) {
@@ -40,7 +42,7 @@ public class MyEsSinkFunction implements ElasticsearchSinkFunction<AdClickData> 
          * */
 
 
-
+        log.info("process element={}",element);
         HashMap<String, String> dataSource = new HashMap<>();
         dataSource.put("id", element.getId());
         dataSource.put("platform", element.getPlatform().toString());
