@@ -6,12 +6,18 @@ import cn.mykine.userbehavior.bean.utils.FlinkUtils;
 import cn.mykine.userbehavior.bean.utils.MyKafkaStringDeserializationSchema;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.connectors.elasticsearch7.ElasticsearchSink;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.util.ArrayList;
 
@@ -42,40 +48,31 @@ public class UGUserActiveData {
                         }
                     })
                     .setParallelism(3);
-            //过滤出新用户
+            //过滤出有效的新用户数据
             DataStream<LoginUserData> newUserList = userList
                     .filter(new FilterFunction<LoginUserData>() {
                         @Override
                         public boolean filter(LoginUserData loginUserData) throws Exception {
+                            if(
+                                    StringUtils.isBlank(loginUserData.getIosDeviceid())
+                                            &&StringUtils.isBlank(loginUserData.getImei())
+                                            &&StringUtils.isBlank(loginUserData.getOaid())
+                                            &&StringUtils.isBlank(loginUserData.getAndroidId())
+                            ){
+                                System.out.println("无效的用户数据:"+JSON.toJSONString(loginUserData));
+                                log.info("无效的用户数据:{}",loginUserData);
+                                return false;
+                            }
+
                             return loginUserData.getIsNew()!=null && loginUserData.getIsNew()==1;
                         }
                     }).setParallelism(3);
 
-            //查询es是否广告投放转化的用户，进一步过滤，匹配成功附加广告投放相关的字段值
-
-
-            //sink-写入到es
+            //sink-查询匹配转化数据并写入到es
             newUserList.print();
-
-//            // 定义es的连接配置
-            ArrayList<HttpHost> httpHosts = new ArrayList<>();
-            httpHosts.add(new HttpHost("192.168.10.135", 9200));
-            httpHosts.add(new HttpHost("192.168.10.136", 9200));
-            httpHosts.add(new HttpHost("192.168.10.137", 9200));
-
-            ElasticsearchSink.Builder<LoginUserData> adClickDataBuilder = new ElasticsearchSink.Builder<>(
-                    httpHosts,
-                    new MyEsSinkUserActiveFunction()
-            );
-            adClickDataBuilder.setBulkFlushMaxActions(5000);//每5000条数据提交一次
-            adClickDataBuilder.setBulkFlushInterval(1000);//每1s条提交一次
-            adClickDataBuilder.setBulkFlushMaxSizeMb(1);//内存到达1M时刷新
-            newUserList.addSink(adClickDataBuilder.build())
-                    .setParallelism(3)//并行度与es主分片数目一致，提高写入性能
-            ;
-
+            newUserList.addSink(new MyEsSinkUserActiveFunction()).setParallelism(3);
             //exec
-            FlinkUtils.env.execute("adClick");
+            FlinkUtils.env.execute("newUserActive");
 
         } catch (Exception e) {
             log.error("UGAdClickData run error",e);
