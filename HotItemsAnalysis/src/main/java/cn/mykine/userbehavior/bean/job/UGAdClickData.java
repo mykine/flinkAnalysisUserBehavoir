@@ -1,16 +1,20 @@
 package cn.mykine.userbehavior.bean.job;
 
 import cn.mykine.userbehavior.bean.pojo.AdClickData;
+import cn.mykine.userbehavior.bean.udf.FilterIosAdBlackList;
 import cn.mykine.userbehavior.bean.udf.MyEsSinkFunction;
 import cn.mykine.userbehavior.bean.utils.FlinkUtils;
 import cn.mykine.userbehavior.bean.utils.MyKafkaStringDeserializationSchema;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.connectors.elasticsearch7.ElasticsearchSink;
 import org.apache.http.HttpHost;
+
 
 import java.util.ArrayList;
 
@@ -41,8 +45,19 @@ public class UGAdClickData {
                         }
                     }).setParallelism(3);
 
+            /**
+             * 风控处理-同一个用户一天内点同一个广告达到一定次数进入黑名单，不算入有效的广告用户数据
+             * 模拟对苹果用户投放时的情景
+             * */
+            KeyedStream<AdClickData, Tuple2<String, String>> adClickDataTuple2KeyedStream =
+                    mapList.keyBy(new IosBlackListKeySelector());//分组
+
+            DataStream<AdClickData> processList = adClickDataTuple2KeyedStream
+                    .process(new FilterIosAdBlackList(5));//处理刷点击量的用户数据
+
+
             //sink-写入到es
-            mapList.print();
+            processList.print();
 
 //            // 定义es的连接配置
             ArrayList<HttpHost> httpHosts = new ArrayList<>();
@@ -57,7 +72,7 @@ public class UGAdClickData {
             adClickDataBuilder.setBulkFlushMaxActions(5000);//每5000条数据提交一次
             adClickDataBuilder.setBulkFlushInterval(1000);//每1s条提交一次
             adClickDataBuilder.setBulkFlushMaxSizeMb(1);//内存到达1M时刷新
-            mapList.addSink(adClickDataBuilder.build())
+            processList.addSink(adClickDataBuilder.build())
                     .setParallelism(3)//并行度与es主分片数目一致，提高写入性能
             ;
 
@@ -69,4 +84,14 @@ public class UGAdClickData {
             e.printStackTrace();
         }
     }
+
+    public static class IosBlackListKeySelector implements KeySelector<AdClickData, Tuple2<String,String>>{
+
+        @Override
+        public Tuple2<String, String> getKey(AdClickData adClickData) throws Exception {
+            return new Tuple2<>(adClickData.getIosDeviceid(),adClickData.getAdName());
+        }
+
+    }
+
 }
