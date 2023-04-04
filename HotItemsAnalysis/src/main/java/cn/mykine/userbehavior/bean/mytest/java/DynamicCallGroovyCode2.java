@@ -40,7 +40,7 @@ public class DynamicCallGroovyCode2 {
             System.out.println("showMeRes="+showMeRes);
         }
 
-
+        statement.close();
         conn.close();
     }
 }
