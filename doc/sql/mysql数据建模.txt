@@ -1,0 +1,15 @@
+###### 创建数据库 #######################
+CREATE DATABASE marketing DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+
+######### 创建数据表 ####################
+create table test_code1(
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `class_name` varchar(512)  NULL DEFAULT '' COMMENT '类名称',
+    `groovy_code` text COMMENT 'groovy代码',
+    `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT =1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码测试表' ROW_FORMAT = DYNAMIC;
+
+
+
