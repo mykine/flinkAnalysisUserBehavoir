@@ -14,7 +14,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.11.2</flink.version>
+        <flink.version>1.14.4</flink.version>
         <elasticsearch.version>7.8.0</elasticsearch.version>
         <target.java.version>1.8</target.java.version>
         <scala.binary.version>2.12</scala.binary.version>
@@ -126,17 +126,17 @@
         </dependency>
 
         <!-- flink-cdc-mysql 连接器，要与flink版本保持对应-->
-        <dependency>
-            <groupId>com.alibaba.ververica</groupId>
-            <artifactId>flink-cdc-connectors</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
 <!--        <dependency>-->
-<!--            <groupId>com.ververica</groupId>-->
+<!--            <groupId>com.alibaba.ververica</groupId>-->
 <!--            <artifactId>flink-cdc-connectors</artifactId>-->
-<!--            <version>2.3-SNAPSHOT</version>-->
+<!--            <version>1.1.0</version>-->
 <!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-sql-connector-mysql-cdc</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
         <dependency>
