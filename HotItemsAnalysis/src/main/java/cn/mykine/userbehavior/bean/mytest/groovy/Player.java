@@ -4,6 +4,6 @@ public interface Player {
 
     void play();
 
-    String showMe(int height ,int weight);
+    String showMe(String name, Integer height ,Integer weight);
 
 }

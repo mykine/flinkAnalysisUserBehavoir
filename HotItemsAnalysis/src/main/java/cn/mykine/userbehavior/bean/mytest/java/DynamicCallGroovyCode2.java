@@ -1,23 +1,21 @@
 package cn.mykine.userbehavior.bean.mytest.java;
 
-import com.alibaba.fastjson.JSON;
-import com.mysql.jdbc.Driver;
+import cn.mykine.userbehavior.bean.mytest.groovy.Player;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import groovy.lang.Tuple2;
 
 import java.sql.*;
 
 /**
  * 动态加载groovy代码并通过反射实例化对象调用其方法
  * */
-public class DynamicCallGroovyCode {
+public class DynamicCallGroovyCode2 {
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
         Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://192.168.10.98:3306/marketing?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false",
                 "root", "jyIsTpYmq7%Z");
         Statement statement = conn.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from test_code1 limit 100;");
+        ResultSet resultSet = statement.executeQuery("select * from test_code1 where id > 1 limit 100;");
         //指向数据的指针移动，有数据时返回true
         while(resultSet.next()){
             System.out.println("=================================================");
@@ -30,18 +28,15 @@ public class DynamicCallGroovyCode {
             GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
             //加载代码
             Class gClass = groovyClassLoader.parseClass(groovyCode);
-            //反射调用无参构造函数实例化成一个groovy对象
-            GroovyObject obj = (GroovyObject)gClass.newInstance();
-            obj.invokeMethod("play", null);
-            obj.invokeMethod("play", "篮球");
-            /**
-             * 多个参数，使用invokeMethod反射调用对象方法时，使用Obeject[] args数组传入对应所有参数值
-             * */
-            String name = "克莱";
+            //反射调用无参构造函数实例化成都实现的接口对象
+            Player player = (Player)gClass.newInstance();
+            player.play();
+
+            String name = "老梅";
             Integer height = 200;
             Integer weight = 160;
-            Object[] params = new Object[]{name,height,weight};
-            String showMeRes = (String)obj.invokeMethod("showMe", params);
+
+            String showMeRes = player.showMe(name,height,weight);
             System.out.println("showMeRes="+showMeRes);
         }
 

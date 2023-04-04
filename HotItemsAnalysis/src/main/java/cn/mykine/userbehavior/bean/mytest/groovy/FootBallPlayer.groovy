@@ -8,8 +8,8 @@ class FootBallPlayer implements Player{
     }
 
     @Override
-    String showMe(int height ,int weight) {
-        return "我是个篮球运动员,身高:"+height+"cm,体重:"+weight+"kg";
+    String showMe(String name,Integer height ,Integer weight) {
+        return "你好，我叫"+name+",我是个足球运动员,身高:"+height+"cm,体重:"+weight+"kg";
     }
 
 }
