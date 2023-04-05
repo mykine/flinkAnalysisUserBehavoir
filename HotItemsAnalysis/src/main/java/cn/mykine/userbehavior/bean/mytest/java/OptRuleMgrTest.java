@@ -13,6 +13,7 @@ import java.sql.*;
 public class OptRuleMgrTest {
     public static void main(String[] args) throws IOException, SQLException {
         //模拟读取到es中的画像人群uid列表
+//        int[] ruleTargetUids = new int[]{10001,20002,30003,50005};
         long[] ruleTargetUids = new long[]{10001,20002,30003,50005};
 
         //将人群id转换成bitmap

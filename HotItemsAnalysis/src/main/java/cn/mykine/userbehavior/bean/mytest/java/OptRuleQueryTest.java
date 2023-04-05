@@ -2,6 +2,7 @@ package cn.mykine.userbehavior.bean.mytest.java;
 
 import cn.mykine.userbehavior.bean.mytest.groovy.Player;
 import groovy.lang.GroovyClassLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.roaringbitmap.longlong.Roaring64Bitmap;
 
 import java.io.ByteArrayOutputStream;
@@ -13,6 +14,7 @@ import java.sql.*;
 /**
  * 模拟规则管理后台管理规则数据到mysql
  * */
+@Slf4j
 public class OptRuleQueryTest {
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException, IOException {
         Connection conn = DriverManager.getConnection(
@@ -22,6 +24,7 @@ public class OptRuleQueryTest {
         ResultSet resultSet = statement.executeQuery("select * from test_user1 limit 100;");
         //指向数据的指针移动，有数据时返回true
         while(resultSet.next()){
+            log.info("开始处理数据");
             System.out.println("=================================================");
             String ruleName = resultSet.getString("rule_name");
             byte[] uidsBitmaps = resultSet.getBytes("uids_bitmap");
